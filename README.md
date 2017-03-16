@@ -1,5 +1,11 @@
-Usage:
+# gitsubmoduleinfo
+
+Display information about git submodules inside a repository
+
+# Install:
 
     npm install -g gitsubmoduleinfo
 
-Then type `gitsubmoduleinfo` in the directory of your project
+# Usage:
+
+Type `gitsubmoduleinfo` in the directory of your project

@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var Glob = require('glob');
 var Path = require('path');
 var Promise = require('bluebird');

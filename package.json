@@ -1,6 +1,6 @@
 {
   "name": "gitsubmoduleinfo",
-  "version": "1.0.2",
+  "version": "1.0.8",
   "description": "View information on git submodules in a project",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,8 @@
     "type" : "git", 
 	"url" : "https://github.com/davidbnk/gitsubmoduleinfo"
   },
+  "bin" : "./index.js",
+  "preferGlobal": "true",
   "author": "David Benko",
   "license": "ISC",
   "dependencies": {
