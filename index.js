@@ -46,15 +46,25 @@ Promise.mapSeries(filePaths, function(filePath) {
 			var candidateBranches = stdout
 				.split(/\r\n|\r|\n/g)
 				.map(s => s.trim())
-				.sort(s => s.indexOf('*') !== -1 || s === 'master' ? 1 : -1)
+				.sort(function(a, b) {
+					
+					if (a.indexOf('*') !== -1) {
+						return -1;
+					}
+					if (b.indexOf('*') !== -1) {
+						return 1;
+					}
+					if (a === 'master') {
+						return -1;
+					}
+					if (b === 'master') {
+						return 1;
+					}
+					return a > b ? 1 : -1;
+				})
 				.map(s => s.replace ('* ', ''))
 				.filter(Boolean)
-				.filter(c => c.indexOf('HEAD detached at') === -1)
-				.filter(c => c !== 'master');
-			
-			if (candidateBranches.length === 0) {
-				candidateBranches.push('master');
-			}
+				.filter(c => c.indexOf('HEAD detached at') === -1);
 			
 			currentBranch = candidateBranches[0];
 			
