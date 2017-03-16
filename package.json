@@ -1,12 +1,16 @@
 {
   "name": "gitsubmoduleinfo",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "View information on git submodules in a project",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository":{
+    "type" : "git", 
+	"url" : "https://github.com/davidbnk/gitsubmoduleinfo"
+  },
+  "author": "David Benko",
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.0",
