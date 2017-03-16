@@ -66,6 +66,10 @@ Promise.mapSeries(filePaths, function(filePath) {
 				.filter(Boolean)
 				.filter(c => c.indexOf('HEAD detached at') === -1);
 			
+			if (candidateBranches.length === 0) {
+				candidateBranches.push('master');
+			}
+			
 			currentBranch = candidateBranches[0];
 			
 			console.log('-> Your current branch is:');
