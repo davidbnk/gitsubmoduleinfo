@@ -1,6 +1,6 @@
 {
   "name": "gitsubmoduleinfo",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "View information on git submodules in a project",
   "main": "index.js",
   "scripts": {
