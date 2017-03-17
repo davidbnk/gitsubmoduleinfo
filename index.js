@@ -17,9 +17,45 @@ Promise.mapSeries(filePaths, function (filePath) {
 	console.log('##################################################################################################');
 	console.log('-> Verifying repository', filePath);
 
-	var currentBranchPromise = Promise.try(function () {
+	var remoteBranchesPromise = Promise.try(function() {
+
+		console.log('-> Fetching all remote branches ...');
+
+		return Exec(
+			'git fetch --all', {
+				cwd: filePath
+			}
+		).then(function (stdout, stderr) {
+
+			return Exec('git branch -r', { cwd: filePath });
+		}).then(function (stdout, stderr) {
+
+			var branches = stdout
+			.split('\n')
+			.map((s) => s.trim())
+			.filter((s) => s !== 'origin/HEAD -> origin/master')
+			.filter(Boolean)
+			.map((s) => s.split('/')[1]);
+
+			return Promise.resolve(branches);
+		});
+	});
+
+	var currentBranchPromise = remoteBranchesPromise.then(function(branches) {
 
 		console.log('-> Checking current branch ...');
+
+		var branchTracksPromise = branches.map(function(branch) {
+			
+			return Exec('git branch --track '+ branch + ' origin/' + branch, {
+				cwd: filePath
+			}).catch(function() {
+				// Ignores branch already exists errors
+			});
+		});
+
+		return Promise.all(branchTracksPromise);
+	}).then(function (stdout, stderr) {
 
 		return Exec(
 			'git show -s --pretty=%d HEAD', {
@@ -91,43 +127,19 @@ Promise.mapSeries(filePaths, function (filePath) {
 		return Promise.resolve(currentBranch);
 	});
 
-	var branchesPromise = currentBranchPromise.then(function (currentBranch) {
-
-		console.log('-> Fetching all remote branches ...');
-
-		return Exec(
-			'git fetch --all', {
-				cwd: filePath
-			}
-		).then(function (stdout, stderr) {
-
-			return Exec('git branch -r', { cwd: filePath });
-		}).then(function (stdout, stderr) {
-
-			var branches = stdout
-			.split('\n')
-			.map((s) => s.trim())
-			.filter((s) => s !== 'origin/HEAD -> origin/master')
-			.filter(Boolean)
-			.map((s) => s.split('/')[1]);
-
-			console.log('-> Found remote branches:');
-			branches.forEach(function (branch) {
-
-				if (branch !== currentBranch) {
-					console.log(Colors.bgYellow('- ' + branch));
-				} else {
-					console.log(Colors.bgCyan('* ' + branch));
-				}
-			});
-
-			return Promise.resolve(branches);
-		});
-	});
-
 	return Promise.all(
-		[branchesPromise, currentBranchPromise]
+		[remoteBranchesPromise, currentBranchPromise]
 	).spread(function (branches, currentBranch) {
+
+		console.log('-> Found remote branches:');
+		branches.forEach(function (branch) {
+
+			if (branch !== currentBranch) {
+				console.log(Colors.bgYellow('- ' + branch));
+			} else {
+				console.log(Colors.bgCyan('* ' + branch));
+			}
+		});
 
 		return Promise.mapSeries(branches, function (branch) {
 
@@ -144,7 +156,7 @@ Promise.mapSeries(filePaths, function (filePath) {
 					if (branch === currentBranch) {
 						console.warn(Colors.red('Your local branch', branch, 'is behind remote for', behind, 'commits'));
 					} else {
-						console.log(Colors.yellow('Your local branch', branch, 'is behind remote for', behind, 'commits'));
+						console.log('Your local branch', branch, 'is behind remote for', behind, 'commits');
 					}
 				} else {
 					console.log('Your local branch', branch, 'is up to date with remote');
@@ -182,7 +194,7 @@ Promise.mapSeries(filePaths, function (filePath) {
 		});
 	}).catch(function (err) {
 
-		console.error('ERROR:', err);
+		console.error(Colors.red('ERROR: ' + err.message));
 	});
 });
 
