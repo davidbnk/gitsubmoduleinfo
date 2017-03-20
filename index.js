@@ -22,7 +22,7 @@ Promise.mapSeries(filePaths, function (filePath) {
 		console.log('-> Fetching all remote branches ...');
 
 		return Exec(
-			'git fetch --all', {
+			'git fetch --all --prune', {
 				cwd: filePath
 			}
 		).then(function (stdout, stderr) {
