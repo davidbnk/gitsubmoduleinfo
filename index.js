@@ -121,8 +121,8 @@ Promise.mapSeries(filePaths, function (filePath) {
 			throw Error('Could not determine current branch');
 		}
 
-		console.log('-> Your current local branch is:');
-		console.log(Colors.bgCyan(currentBranch));
+		console.log('-> Your current ' + Colors.underline('LOCAL') + ' branch is:');
+		console.log(Colors.bgCyan('* ' + currentBranch));
 
 		return Promise.resolve(currentBranch);
 	});
@@ -131,11 +131,11 @@ Promise.mapSeries(filePaths, function (filePath) {
 		[remoteBranchesPromise, currentBranchPromise]
 	).spread(function (branches, currentBranch) {
 
-		console.log('-> Found remote branches:');
+		console.log('-> Found ' + Colors.underline('REMOTE') + ' branches:');
 		branches.forEach(function (branch) {
 
 			if (branch !== currentBranch) {
-				console.log(Colors.bgYellow('- ' + branch));
+				console.log(Colors.inverse('- ' + branch));
 			} else {
 				console.log(Colors.bgCyan('* ' + branch));
 			}
