@@ -79,14 +79,21 @@ Promise.mapSeries(filePaths, function (filePath) {
 			// Could not detect with first command
 			// Attempt a second command
 			return Exec(
-			'git branch --contains HEAD', {
+			'git branch -a --contains HEAD', {
 				cwd: filePath
 			}).then(function (stdout2, stderr2) {
 
 				candidateBranches = stdout2
 					.split(/\r\n|\r|\n/g)
 					.map((s) => s.trim())
-					.sort(function (a, b) {
+					.map(function(s) {
+						
+						if (s.indexOf('/') !== -1) {
+							var split = s.split('/');
+							return split[split.length - 1];
+						}
+						return s;
+					}).sort(function (a, b) {
 
 						if (a.indexOf('*') !== -1) {
 							return -1;
